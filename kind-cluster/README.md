@@ -24,6 +24,9 @@ rm -rf kind
 
 echo "kind & kubectl installation complete."
 ```
+# To Give permission to Docker so that it can run without root user 
+
+sudo usermod -aG docker $USER && newgrp docker
 
 ## 2. Setting Up the KIND Cluster
 Create a kind-cluster-config.yaml file:
