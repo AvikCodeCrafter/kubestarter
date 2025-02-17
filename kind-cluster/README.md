@@ -69,6 +69,7 @@ Use kubectl to interact with the cluster:
 ```bash
 
 kubectl cluster-info
+alias k=kubectl
 ```
 
 
