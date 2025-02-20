@@ -66,9 +66,11 @@ kind create cluster --config kind-cluster-config.yaml --name my-kind-cluster
 Verify the cluster:
 
 ```bash
-
+kubectl config get-contexts
 kubectl get nodes
 kubectl cluster-info
+kubectl cluster-info --context kind-kind-cluster
+kubectl config use-context kind-kind-cluster
 ```
 ## 3. Accessing the Cluster
 Use kubectl to interact with the cluster:
