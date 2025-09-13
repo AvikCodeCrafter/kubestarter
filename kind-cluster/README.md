@@ -89,7 +89,7 @@ chmod +x install-kind-kubectl.sh
 
 ```
 
-```
+
 # To Give permission to Docker so that it can run without root user 
 
 sudo usermod -aG docker $USER && newgrp docker
