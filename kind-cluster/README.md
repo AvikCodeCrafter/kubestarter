@@ -45,16 +45,18 @@ install_kind() {
   log "Installing kind ${KIND_VERSION} for ${KIND_ARCH}..."
 
   curl -Lo kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-${KIND_ARCH}"
-  curl -Lo kind.sha256sum "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-${KIND_ARCH}.sha256sum"
+  curl -Lo kind.sha256 "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-${KIND_ARCH}.sha256sum"
 
-  sha256sum --check kind.sha256sum || err "kind checksum validation failed!"
+  # Validate checksum
+  echo "$(cat kind.sha256)  kind" | sha256sum --check || err "kind checksum validation failed!"
 
   chmod +x kind
   sudo mv kind "$INSTALL_DIR/"
-  rm -f kind.sha256sum
+  rm -f kind.sha256
 
   kind version
 }
+
 
 # Install latest kubectl
 install_kubectl() {
