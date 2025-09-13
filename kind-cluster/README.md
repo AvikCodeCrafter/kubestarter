@@ -83,6 +83,7 @@ log "✅ kind & kubectl installation complete."
 
 #Make it executable and run it
 
+```bash
 chmod +x install-kind-kubectl.sh
 ./install-kind-kubectl.sh
 
