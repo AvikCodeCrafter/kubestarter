@@ -11,28 +11,71 @@ Install KIND and kubectl using the provided script:
 ```bash
 
 #!/bin/bash
-#This script installs the latest stable versions of kind and kubectl dynamically by querying the official release sources, ensuring that the tools are up to date.
-# Install latest kind (x86_64)
-KIND_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | grep tag_name | cut -d '"' -f 4)
-[ "$(uname -m)" = "x86_64" ] && curl -Lo ./kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
-chmod +x ./kind
-sudo cp ./kind /usr/local/bin/kind
+# Production-ready installer for kind & kubectl (latest stable versions)
+# Supports x86_64 and arm64 architectures on Linux
+# Includes error handling and checksum validation
 
-# Install latest stable kubectl
-KUBECTL_VERSION=$(curl -Ls https://dl.k8s.io/release/stable.txt)
-URL="https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+set -euo pipefail
+
 INSTALL_DIR="/usr/local/bin"
 
-curl -LO "$URL"
-chmod +x kubectl
-sudo mv kubectl $INSTALL_DIR/
-kubectl version --client
+log() {
+  echo -e "\033[1;32m[INFO]\033[0m $1"
+}
 
-# Cleanup
-rm -f kubectl
-rm -rf kind
+err() {
+  echo -e "\033[1;31m[ERROR]\033[0m $1" >&2
+  exit 1
+}
 
-echo "kind & kubectl installation complete."
+# Detect architecture
+ARCH=$(uname -m)
+case "$ARCH" in
+  x86_64)   KIND_ARCH="amd64"; KUBE_ARCH="amd64" ;;
+  aarch64)  KIND_ARCH="arm64"; KUBE_ARCH="arm64" ;;
+  *)        err "Unsupported architecture: $ARCH" ;;
+esac
+
+# Install latest kind
+install_kind() {
+  KIND_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | jq -r .tag_name)
+  log "Installing kind ${KIND_VERSION} for ${KIND_ARCH}..."
+
+  curl -Lo kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-${KIND_ARCH}"
+  curl -Lo kind.sha256sum "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-${KIND_ARCH}.sha256sum"
+
+  sha256sum --check kind.sha256sum || err "kind checksum validation failed!"
+
+  chmod +x kind
+  sudo mv kind "$INSTALL_DIR/"
+  rm -f kind.sha256sum
+
+  kind version
+}
+
+# Install latest kubectl
+install_kubectl() {
+  KUBECTL_VERSION=$(curl -Ls https://dl.k8s.io/release/stable.txt)
+  log "Installing kubectl ${KUBECTL_VERSION} for ${KUBE_ARCH}..."
+
+  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${KUBE_ARCH}/kubectl"
+  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${KUBE_ARCH}/kubectl.sha256"
+
+  echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check || err "kubectl checksum validation failed!"
+
+  chmod +x kubectl
+  sudo mv kubectl "$INSTALL_DIR/"
+  rm -f kubectl.sha256
+
+  kubectl version --client
+}
+
+# Main execution
+install_kind
+install_kubectl
+
+log "✅ kind & kubectl installation complete."
+
 
 ```
 # To Give permission to Docker so that it can run without root user 
