@@ -77,6 +77,7 @@ install_kubectl
 log "✅ kind & kubectl installation complete."
 
 
+
 ```
 # To Give permission to Docker so that it can run without root user 
 
