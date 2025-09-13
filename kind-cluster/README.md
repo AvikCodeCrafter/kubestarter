@@ -100,6 +100,8 @@ nodes:
   image: kindest/node:v1.34.0
 - role: worker
   image: kindest/node:v1.34.0
+- role: worker
+  image: kindest/node:v1.34.0
   extraPortMappings:
     - containerPort: 80
       hostPort: 80
