@@ -14,9 +14,9 @@ Install KIND and kubectl using the provided script:
 ```bash
 
 #!/bin/bash
-# Production-ready installer for kind & kubectl (latest stable versions)
+# Installer for kind & kubectl (latest stable versions)
 # Supports x86_64 and arm64 architectures on Linux
-# Includes error handling and checksum validation
+# Simplified: no checksum validation
 
 set -euo pipefail
 
@@ -45,18 +45,11 @@ install_kind() {
   log "Installing kind ${KIND_VERSION} for ${KIND_ARCH}..."
 
   curl -Lo kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-${KIND_ARCH}"
-  curl -Lo kind.sha256 "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-${KIND_ARCH}.sha256sum"
-
-  # Validate checksum
-  echo "$(cat kind.sha256)  kind" | sha256sum --check || err "kind checksum validation failed!"
-
   chmod +x kind
   sudo mv kind "$INSTALL_DIR/"
-  rm -f kind.sha256
 
   kind version
 }
-
 
 # Install latest kubectl
 install_kubectl() {
@@ -64,13 +57,8 @@ install_kubectl() {
   log "Installing kubectl ${KUBECTL_VERSION} for ${KUBE_ARCH}..."
 
   curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${KUBE_ARCH}/kubectl"
-  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${KUBE_ARCH}/kubectl.sha256"
-
-  echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check || err "kubectl checksum validation failed!"
-
   chmod +x kubectl
   sudo mv kubectl "$INSTALL_DIR/"
-  rm -f kubectl.sha256
 
   kubectl version --client
 }
@@ -80,6 +68,7 @@ install_kind
 install_kubectl
 
 log "✅ kind & kubectl installation complete."
+
 
 ```
 
