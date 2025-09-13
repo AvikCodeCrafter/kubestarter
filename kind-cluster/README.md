@@ -5,6 +5,9 @@
 ```bash
 sudo apt-get update -y
 sudo apt-get install docker.io -y
+sudo systemctl enable docker
+sudo systemctl start docker
+
 ```
 ## 1. Installing KIND and kubectl
 Install KIND and kubectl using the provided script:
