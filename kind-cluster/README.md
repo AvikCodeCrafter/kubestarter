@@ -79,7 +79,14 @@ install_kubectl
 
 log "✅ kind & kubectl installation complete."
 
+```
 
+#Make it executable and run it
+
+chmod +x install-kind-kubectl.sh
+./install-kind-kubectl.sh
+
+```
 
 ```
 # To Give permission to Docker so that it can run without root user 
