@@ -11,13 +11,16 @@ Install KIND and kubectl using the provided script:
 ```bash
 
 #!/bin/bash
-
-[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+#This script installs the latest stable versions of kind and kubectl dynamically by querying the official release sources, ensuring that the tools are up to date.
+# Install latest kind (x86_64)
+KIND_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | grep tag_name | cut -d '"' -f 4)
+[ "$(uname -m)" = "x86_64" ] && curl -Lo ./kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
 chmod +x ./kind
 sudo cp ./kind /usr/local/bin/kind
 
-VERSION="v1.30.0"
-URL="https://dl.k8s.io/release/${VERSION}/bin/linux/amd64/kubectl"
+# Install latest stable kubectl
+KUBECTL_VERSION=$(curl -Ls https://dl.k8s.io/release/stable.txt)
+URL="https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
 INSTALL_DIR="/usr/local/bin"
 
 curl -LO "$URL"
@@ -25,10 +28,12 @@ chmod +x kubectl
 sudo mv kubectl $INSTALL_DIR/
 kubectl version --client
 
+# Cleanup
 rm -f kubectl
 rm -rf kind
 
 echo "kind & kubectl installation complete."
+
 ```
 # To Give permission to Docker so that it can run without root user 
 
